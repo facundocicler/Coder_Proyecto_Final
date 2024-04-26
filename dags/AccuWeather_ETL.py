@@ -208,9 +208,9 @@ def tables_redshift():
 def insert_data(**context):
 
     conn = connection_redshift()
-
-    city_data = get_data(**context)
-    city_df = pd.DataFrame(city_data) 
+    
+    csv_filename = context['ti'].xcom_pull(task_ids='extract_data')
+    city_df = pd.read_csv(csv_filename)
 
     current_datetime = datetime.datetime.now()
 
