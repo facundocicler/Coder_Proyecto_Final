@@ -1,1 +1,0 @@
-El archivo "variables_airflow.json" solo existe en este directorio con el fin de que el profesor o tutor a cargo del curso pueda cargar las credenciales necesarias para Airflow con el objetivo de realizar las pruebas de funcionalidad del proyecto, en otras circunstancias no seria otorgado por motivos de seguridad.
