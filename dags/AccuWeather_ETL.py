@@ -3,17 +3,18 @@ import pandas as pd
 from psycopg2.extras import execute_values
 from airflow.models import Variable
 import datetime
-from decouple import config
 import psycopg2
 
 def connection_redshift():
     try:
-        redshift_host = config('REDSHIFT_HOST')
-        redshift_db = config('REDSHIFT_DB')
-        redshift_user = config('REDSHIFT_USER')
-        redshift_password = config('REDSHIFT_PASSWORD')
-        redshift_port = config('REDSHIFT_PORT')
+        # Obtener valores de las variables de Airflow
+        redshift_host = Variable.get("REDSHIFT_HOST")
+        redshift_db = Variable.get("REDSHIFT_DB")
+        redshift_user = Variable.get("REDSHIFT_USER")
+        redshift_password = Variable.get("REDSHIFT_PASSWORD")
+        redshift_port = Variable.get("REDSHIFT_PORT")
 
+        # Conectar a Redshift usando los valores obtenidos
         conn = psycopg2.connect(
             host=redshift_host,
             dbname=redshift_db,
