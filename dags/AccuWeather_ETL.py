@@ -205,12 +205,12 @@ def tables_redshift():
         conn.close()
 
 
-def insert_data():
+def insert_data(**context):
 
     conn = connection_redshift()
 
-    city_data = get_data()
-    city_df = pd.DataFrame(city_data)   
+    city_data = get_data(**context)
+    city_df = pd.DataFrame(city_data) 
 
     current_datetime = datetime.datetime.now()
 
