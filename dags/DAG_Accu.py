@@ -102,6 +102,7 @@ connection_task = PythonOperator(
 insert_data_task = PythonOperator(
     task_id='insert_data',
     python_callable=insert_data,
+    provide_context=True,
     dag=weather_dag,
 )
 
