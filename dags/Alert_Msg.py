@@ -29,7 +29,7 @@ def check_weather(**context):
             alert_messages.append(alert_message)
 
     if alert_messages:
-        return 
+        return alert_messages
     else:
         print("No se requiere alerta de temperatura.")
 
