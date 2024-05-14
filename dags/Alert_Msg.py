@@ -1,4 +1,4 @@
-def check_and_send_alert(**context):
+def check_weather(**context):
     csv_filename = context['ti'].xcom_pull(task_ids='extract_data')
     df = pd.read_csv(csv_filename)
 
@@ -52,7 +52,7 @@ def check_and_send_alert(**context):
 
 def send_alert(**context):
 
-csv_filename = context['ti'].xcom_pull(task_ids='extract_data')
+csv_filename = context['ti'].xcom_pull(task_ids='check_weather')
     df = pd.read_csv(csv_filename)
     if alert_messages:
         alert_body = "\n".join(alert_messages)
