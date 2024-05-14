@@ -37,7 +37,7 @@ def send_alert(**context):
 
 csv_filename = context['ti'].xcom_pull(task_ids='check_weather')
     df = pd.read_csv(csv_filename)
-    if alert_messages:
+ 
         alert_body = "\n".join(alert_messages)
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
@@ -63,6 +63,3 @@ csv_filename = context['ti'].xcom_pull(task_ids='check_weather')
 
         except Exception as e:
             print(f'Error al enviar el correo electrónico: {str(e)}')
-
-    else:
-        print("No se requiere alerta de temperatura.")
