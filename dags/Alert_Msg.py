@@ -5,7 +5,6 @@ import os
 import pandas as pd
 import smtplib
 
-
 def check_weather(**context):
     csv_filename = context['ti'].xcom_pull(task_ids='extract_data')
     df = pd.read_csv(csv_filename)
