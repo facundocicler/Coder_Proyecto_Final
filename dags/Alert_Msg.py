@@ -35,7 +35,7 @@ def check_weather(**context):
 
 def send_alert(**context):
 
-csv_filename = context['ti'].xcom_pull(task_ids='check_weather')
+    csv_filename = context['ti'].xcom_pull(task_ids='check_weather')
     alert_messages = pd.read_csv(csv_filename)
  
     alert_body = "\n".join(alert_messages)
