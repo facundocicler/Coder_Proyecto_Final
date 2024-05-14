@@ -29,32 +29,7 @@ def check_weather(**context):
             alert_messages.append(alert_message)
 
     if alert_messages:
-        alert_body = "\n".join(alert_messages)
-        smtp_server = 'smtp.gmail.com'
-        smtp_port = 587
-        sender_email = Variable.get("EMAIL")
-        password = Variable.get("EMAIL_PASSWORD")
-
-        subject = f'Alerta de Temperatura de Ciudades Fuera del Rango de {min_temp} °C - {max_temp} °C'
-        message = alert_body
-
-        try:
-            body_text = f"\n{message}"
-            msg = MIMEMultipart()
-            msg['To'] = sender_email
-            msg['From'] = sender_email
-            msg['Subject'] = subject
-            msg.attach(MIMEText(body_text, 'plain'))
-
-            with smtplib.SMTP(smtp_server, smtp_port) as server:
-                server.starttls()
-                server.login(sender_email, password)
-                server.send_message(msg)
-            print('El email fue enviado con éxito')
-
-        except Exception as e:
-            print(f'Error al enviar el correo electrónico: {str(e)}')
-
+        return 
     else:
         print("No se requiere alerta de temperatura.")
 
