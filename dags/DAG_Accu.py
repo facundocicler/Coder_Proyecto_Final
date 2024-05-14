@@ -5,7 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from airflow.models import Variable
 from AccuWeather_ETL import get_data, tables_redshift, insert_data
-from Alert_Msg import check_and_send_alert
+from Alert_Msg import check_weather, send_alert
 import os
 import pandas as pd
 import json
