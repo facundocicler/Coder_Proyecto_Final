@@ -80,7 +80,14 @@ def check_and_send_alert(**context):
     else:
         print("No se requiere alerta de temperatura.")
 
-check_and_send_alert_task = PythonOperator(
+check_weather_task = PythonOperator(
+    task_id='check_and_send_alert',
+    python_callable=check_and_send_alert,
+    provide_context=True,
+    dag=weather_dag,
+)
+
+send_alert_task = PythonOperator(
     task_id='check_and_send_alert',
     python_callable=check_and_send_alert,
     provide_context=True,
