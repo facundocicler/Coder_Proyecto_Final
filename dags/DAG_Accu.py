@@ -38,7 +38,7 @@ connection_task = PythonOperator(
 
 extract_data_task = PythonOperator(
     task_id='extract_data',
-    python_callable=get_data,
+    python_callable=extract_data,
     provide_context=True,
     dag=weather_dag,
 )
