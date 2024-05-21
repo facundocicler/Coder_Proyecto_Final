@@ -28,17 +28,9 @@ weather_dag = DAG(
     catchup=False
 )
 
-check_weather_task = PythonOperator(
-    task_id='check_weather',
-    python_callable=check_weather,
-    provide_context=True,
-    dag=weather_dag,
-)
-
-send_alert_task = PythonOperator(
-    task_id='check_and_send_alert',
-    python_callable=check_and_send_alert,
-    provide_context=True,
+connection_task = PythonOperator(
+    task_id='connection',
+    python_callable=tables_redshift,
     dag=weather_dag,
 )
 
@@ -49,11 +41,32 @@ extract_data_task = PythonOperator(
     dag=weather_dag,
 )
 
-connection_task = PythonOperator(
-    task_id='connection',
-    python_callable=tables_redshift,
+check_weather_task = PythonOperator(
+    task_id='check_weather',
+    python_callable=check_weather,
+    provide_context=True,
     dag=weather_dag,
 )
+
+branch_task = BranchPythonOperator(
+    task_id='branch_task',
+    python_callable=branch_func,
+    provide_context=True,
+    dag=weather_dag,
+)
+
+send_alert_task = PythonOperator(
+    task_id='send_alert',
+    python_callable=send_alert,
+    provide_context=True,
+    dag=weather_dag,
+)
+
+no_alert_needed_task = DummyOperator(
+    task_id='no_alert_needed',
+    dag=weather_dag,
+)
+
 
 insert_data_task = PythonOperator(
     task_id='insert_data',
@@ -62,4 +75,6 @@ insert_data_task = PythonOperator(
     dag=weather_dag,
 )
 
-extract_data_task >> connection_task >> check_and_send_alert_task >> insert_data_task
+extract_data_task >> connection_task >> check_weather_task >> branch_task
+branch_task >> send_alert_task >> insert_data_task
+branch_task >> no_alert_needed_task >> insert_data_task
