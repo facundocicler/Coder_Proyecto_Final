@@ -1,7 +1,6 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from airflow.models import Variable
-import os
 import json
 import pandas as pd
 import smtplib
