@@ -1,15 +1,10 @@
 from datetime import timedelta, datetime
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from airflow.models import Variable
+from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
+from airflow.operators.dummy_operator import DummyOperator
 from AccuWeather_ETL import extract_data, tables_redshift, insert_data
 from Alert_Msg import check_weather, send_alert
 import os
-import pandas as pd
-import json
-import smtplib
 
 
 dag_path = os.getcwd()
@@ -27,6 +22,13 @@ weather_dag = DAG(
     schedule_interval=timedelta(days=1),
     catchup=False
 )
+
+def branch_func(**context):
+    alert_messages = context['ti'].xcom_pull(task_ids='check_weather', key='alert_messages')
+    if alert_messages:
+        return 'send_alert'
+    else:
+        return 'no_alert_needed'
 
 connection_task = PythonOperator(
     task_id='connection',
@@ -66,7 +68,6 @@ no_alert_needed_task = DummyOperator(
     task_id='no_alert_needed',
     dag=weather_dag,
 )
-
 
 insert_data_task = PythonOperator(
     task_id='insert_data',
