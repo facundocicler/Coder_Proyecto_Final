@@ -30,8 +30,16 @@ def connection_redshift():
         print(e)
         return None
 
-def get_data(**context):
-    df_final = pd.DataFrame(columns=['Key', 'City', 'Country_ID', 'Country', 'TimeZone_Code', 'Name', 'Gmt_Offset', 'Is_Daylight_Saving', 'Next_Offset_Change', 'LocalObservation_DateTime', 'EpochTime', 'Latitude', 'Longitude', 'Elevation_Metric_Value', 'Elevation_Metric_Unit', 'Elevation_Imperial_Value', 'Elevation_Imperial_Unit', 'Weather_Text', 'Weather_Icon', 'Has_Precipitation', 'Precipitation_Type', 'Is_Day_Time', 'Temperature_Metric_Value', 'Temperature_Metric_Unit', 'Temperature_Imperial_Value', 'Temperature_Imperial_Unit'])
+def extract_data(**context):
+    columns = [
+        'key', 'city', 'country_id', 'country', 'timezone_code', 'name', 'gmt_offset', 
+        'is_daylight_saving', 'next_offset_change', 'localobservation_datetime', 'epochtime', 
+        'latitude', 'longitude', 'elevation_metric_value', 'elevation_metric_unit', 
+        'elevation_imperial_value', 'elevation_imperial_unit', 'weather_text', 'weather_icon', 
+        'has_precipitation', 'precipitation_type', 'is_day_time', 'temperature_metric_value', 
+        'temperature_metric_unit', 'temperature_imperial_value', 'temperature_imperial_unit'
+    ]
+    df_final = []
 
     api_url = Variable.get("API_URL")
     api_key = Variable.get("API_KEY")
@@ -39,46 +47,49 @@ def get_data(**context):
 
     try:
         response = requests.get(url)
+        response.raise_for_status()
         data = response.json()
     except requests.exceptions.RequestException as e:
         print(f"Error en la solicitud: {e}")
-        data = []
+        return
 
     for entry in data:
         row_data = {
-            'Key': entry['Key'],
-            'City': entry['LocalizedName'],
-            'Country_ID': entry['Country']['ID'],
-            'Country': entry['Country']['LocalizedName'],
-            'TimeZone_Code': entry['TimeZone']['Code'],
-            'Name': entry['TimeZone']['Name'],
-            'Gmt_Offset': entry['TimeZone']['GmtOffset'],
-            'Is_Daylight_Saving': entry['TimeZone']['IsDaylightSaving'],
-            'Next_Offset_Change': entry['TimeZone']['NextOffsetChange'],
-            'LocalObservation_DateTime': entry['LocalObservationDateTime'],
-            'EpochTime': entry['EpochTime'],
-            'Latitude': entry['GeoPosition'].get('Latitude', None),
-            'Longitude': entry['GeoPosition'].get('Longitude', None),
-            'Elevation_Metric_Value': entry['Temperature']['Metric'].get('Value', None),
-            'Elevation_Metric_Unit': entry['Temperature']['Metric'].get('Unit', None),
-            'Elevation_Imperial_Value': entry['Temperature']['Imperial'].get('Value', None),
-            'Elevation_Imperial_Unit': entry['Temperature']['Imperial'].get('Unit', None),
-            'Weather_Text': entry['WeatherText'],
-            'Weather_Icon': entry['WeatherIcon'],
-            'Has_Precipitation': entry['HasPrecipitation'],
-            'Precipitation_Type': entry['PrecipitationType'],
-            'Is_Day_Time': entry['IsDayTime'],
-            'Temperature_Metric_Value': entry['Temperature']['Metric'].get('Value', None),
-            'Temperature_Metric_Unit': entry['Temperature']['Metric'].get('Unit', None),
-            'Temperature_Imperial_Value': entry['Temperature']['Imperial'].get('Value', None),
-            'Temperature_Imperial_Unit': entry['Temperature']['Imperial'].get('Unit', None)
+            'key': entry['Key'],
+            'city': entry['LocalizedName'],
+            'country_id': entry['Country']['ID'],
+            'country': entry['Country']['LocalizedName'],
+            'timezone_code': entry['TimeZone']['Code'],
+            'name': entry['TimeZone']['Name'],
+            'gmt_offset': entry['TimeZone']['GmtOffset'],
+            'is_daylight_saving': entry['TimeZone']['IsDaylightSaving'],
+            'next_offset_change': entry['TimeZone']['NextOffsetChange'],
+            'localobservation_datetime': entry['LocalObservationDateTime'],
+            'epochtime': entry['EpochTime'],
+            'latitude': entry['GeoPosition'].get('Latitude', None),
+            'longitude': entry['GeoPosition'].get('Longitude', None),
+            'elevation_metric_value': entry['Temperature']['Metric'].get('Value', None),
+            'elevation_metric_unit': entry['Temperature']['Metric'].get('Unit', None),
+            'elevation_imperial_value': entry['Temperature']['Imperial'].get('Value', None),
+            'elevation_imperial_unit': entry['Temperature']['Imperial'].get('Unit', None),
+            'weather_text': entry['WeatherText'],
+            'weather_icon': entry['WeatherIcon'],
+            'has_precipitation': entry['HasPrecipitation'],
+            'precipitation_type': entry['PrecipitationType'],
+            'is_day_time': entry['IsDayTime'],
+            'temperature_metric_value': entry['Temperature']['Metric'].get('Value', None),
+            'temperature_metric_unit': entry['Temperature']['Metric'].get('Unit', None),
+            'temperature_imperial_value': entry['Temperature']['Imperial'].get('Value', None),
+            'temperature_imperial_unit': entry['Temperature']['Imperial'].get('Unit', None)
         }
-        df_final = df_final.append(row_data, ignore_index=True)
+        df_final.append(row_data)
+
+    df_final = pd.DataFrame(df_final, columns=columns)
 
     csv_filename = f"{context['ds']}_weather_data.csv"
-    df_final.columns = df_final.columns.str.lower()
     df_final.to_csv(csv_filename, index=False)
 
+    context['ti'].xcom_push(key='csv_filename', value=csv_filename)
     return csv_filename
 
 
