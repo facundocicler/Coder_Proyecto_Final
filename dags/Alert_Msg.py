@@ -18,10 +18,9 @@ def check_weather(**context):
             print(f'Error al cargar el archivo JSON: {str(e)}')
             return
 
-    # Ajusta los nombres de las columnas según los nombres reales en el CSV
-    city = df['city'] if 'city' in df.columns else df['City']
-    country = df['country'] if 'country' in df.columns else df['Country']
-    temperature = df['temperature_metric_value'] if 'temperature_metric_value' in df.columns else df['Temperature_Metric_Value']
+    city = df['city']
+    country = df['country']
+    temperature = df['temperature_metric_value']
     
     alert_messages = []
 
